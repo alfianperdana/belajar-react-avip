@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
+
 const AuthLayout = (props) => {
-    const {children, title} = props;
+    const {children, title, type} = props;
     return (
         <div className="flex justify-center min-h-screen items-center">
             <div className="w-full max-w-xs">
@@ -8,6 +10,15 @@ const AuthLayout = (props) => {
                 Welcome. Please Enter Your Detail:
                 </p>
                 {children}
+                <p className="text-center text-gray-600">
+                    {type === "login" ? "Don't have an account? " : "Already have an account? "}
+                    {type === "login" && (
+                        <Link to="/register" className="text-blue-500 hover:underline">Register</Link>
+                    )}
+                    {type === "register" && (
+                        <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
+                    )}
+                </p>
             </div>
         </div>
     )
