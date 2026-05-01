@@ -1,5 +1,5 @@
 import CardProduct from "../components/Fragments/CardProduct";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import Button from "../components/Elements/Button";
 
 const products = [
@@ -8,7 +8,7 @@ const products = [
     name: "Nike Air Max 270",
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolor culpa obcaecati enim, blanditiis quis voluptas nulla perferendis labore temporibus esse. Sunt enim cum perspiciatis fugiat? Impedit quibusdam dolorem exercitationem porro?",
-    price: "Rp. 1.000.000",
+    price: 1000000,
     image: "/images/shoes-1.jpg",
   },
   {
@@ -16,14 +16,14 @@ const products = [
     name: "Nike Air Max 280",
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolor culpa obcaecati enim, blanditiis quis voluptas nulla perferendis labore temporibus esse.",
-    price: "Rp. 2.000.000",
+    price: 2000000,
     image: "/images/shoes-1.jpg",
   },
   {
     id: 3,
     name: "Nike Air Max 290",
     description: "Ini sepatu baru yang dikeluarkan oleh Nike.",
-    price: "Rp. 3.000.000",
+    price: 3000000,
     image: "/images/shoes-1.jpg",
   },
 ];
@@ -31,11 +31,30 @@ const products = [
 const email = localStorage.getItem("email");
 
 const ProductsPage = () => {
+  const [cart, setCart] = useState([
+    {
+      id: 1,
+      qty: 1,
+    }
+  ]);
+
   const handleLogout = () => {
     localStorage.removeItem("email");
     localStorage.removeItem("password");
     window.location.href = "/login";
   };
+
+const handleAddToCart = (id) => {
+  if (cart.find((item) => item.id === id)) {
+    setCart(
+      cart.map((item) =>
+        item.id === id ? { ...item, qty: item.qty + 1 } : item
+      )
+    );
+  } else {
+    setCart([...cart, { id, qty: 1 }]);
+  }
+};
 
   return (
     // Menggunakan Fragment untuk membungkus elemen-elemen tanpa menambahkan node tambahan ke DOM (hanya bisa mereturn 1 component)
@@ -48,16 +67,43 @@ const ProductsPage = () => {
       </div>
 
       <div className="flex justify-center py-5">
-        {products.map((product) => (
-          <CardProduct key={product.id}>
-            <CardProduct.Header image={product.image} />
-            <CardProduct.Body name={product.name}>
-              {product.description}
-            </CardProduct.Body>
-            <CardProduct.Footer price={product.price} />
-          </CardProduct>
-        ))}
-        ;
+        <div className="w-3/4 flex flex-wrap">
+          {products.map((product) => (
+            <CardProduct key={product.id}>
+              <CardProduct.Header image={product.image} />
+              <CardProduct.Body name={product.name}>
+                {product.description}
+              </CardProduct.Body>
+              <CardProduct.Footer price={product.price} id={product.id} handleAddToCart={handleAddToCart} />
+            </CardProduct>
+          ))}
+        </div>
+        <div className="w-1/4">
+          <h1 className="text-3xl font-bold text-blue-600">Cart</h1>
+          <table className="text-left table-auto border-separate w-full mt-5">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cart.map((item) => {
+                const product = products.find((product) => product.id === item.id);
+                return (
+                  <tr key={item.id}>
+                    <td>{product.name}</td>
+                    <td>{product.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+                    <td>{item.qty}</td>
+                    <td>{(product.price * item.qty).toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </Fragment>
   );
